@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ms-vidasalud-bff
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Issuer del IDaaS. Debe coincidir EXACTO con el claim "iss" del token.
+          #
+          #  - Microsoft Entra ID:    https://login.microsoftonline.com/<TENANT_ID>/v2.0
+          #  - Entra External ID:     https://<TENANT_ID>.ciamlogin.com/<TENANT_ID>/v2.0
+          #
+          # Define AZURE_ISSUER_URI para sobrescribirlo; si no, se usa Entra ID.
+          # Ante la duda, decodifica tu token en https://jwt.io y copia el "iss".
+          issuer-uri: ${AZURE_ISSUER_URI:https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0}
+
+vidasalud:
+  security:
+    allowed-audiences:
+      - api://${AZURE_API_CLIENT_ID}
+      - ${AZURE_API_CLIENT_ID}
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://localhost:4200}
+    internal-key: ${INTERNAL_KEY:vidasalud-internal}
+  downstream:
+    appointments: ${MS_APPOINTMENTS_URL:http://localhost:8081}
+    catalog: ${MS_CATALOG_URL:http://localhost:8082}
+    report: ${MS_REPORT_URL:http://localhost:8081}
+    audit: ${MS_AUDIT_URL:http://localhost:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.springframework.security: INFO
