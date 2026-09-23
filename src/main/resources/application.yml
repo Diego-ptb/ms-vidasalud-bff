@@ -22,8 +22,10 @@ vidasalud:
     allowed-audiences:
       - api://${AZURE_API_CLIENT_ID}
       - ${AZURE_API_CLIENT_ID}
-    allowed-origins:
-      - ${FRONTEND_ORIGIN:http://localhost:4200}
+    # Acepta varios origenes separados por coma, p.ej.:
+    #   FRONTEND_ORIGINS=http://localhost:4200,http://52.73.193.15
+    # Util para probar desde el equipo local contra el backend desplegado.
+    allowed-origins: ${FRONTEND_ORIGINS:${FRONTEND_ORIGIN:http://localhost:4200}}
     internal-key: ${INTERNAL_KEY:vidasalud-internal}
   downstream:
     appointments: ${MS_APPOINTMENTS_URL:http://localhost:8081}
