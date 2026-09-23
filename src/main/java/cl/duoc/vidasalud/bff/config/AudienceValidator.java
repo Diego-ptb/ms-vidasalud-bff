@@ -24,13 +24,17 @@ public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
         if (allowedAudiences.isEmpty()) {
             return OAuth2TokenValidatorResult.success();
         }
-        boolean match = token.getAudience().stream().anyMatch(allowedAudiences::contains);
+        List<String> audiencias = token.getAudience();
+
+        // Un token sin claim "aud" no puede validarse: se rechaza, nunca se
+        // deja pasar por omision.
+        boolean match = audiencias != null && audiencias.stream().anyMatch(allowedAudiences::contains);
         if (match) {
             return OAuth2TokenValidatorResult.success();
         }
         return OAuth2TokenValidatorResult.failure(new OAuth2Error(
                 "invalid_token",
-                "La audiencia del token no corresponde a esta API. aud=" + token.getAudience(),
+                "La audiencia del token no corresponde a esta API. aud=" + audiencias,
                 null));
     }
 }

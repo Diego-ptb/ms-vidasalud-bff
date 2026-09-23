@@ -1,5 +1,6 @@
 package cl.duoc.vidasalud.bff.web;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,13 +21,18 @@ public class MeController {
     @GetMapping
     public Map<String, Object> me(@AuthenticationPrincipal Jwt jwt) {
         List<String> roles = jwt.getClaimAsStringList("roles");
-        return Map.of(
-                "subject", String.valueOf(jwt.getSubject()),
-                "name", String.valueOf(jwt.getClaimAsString("name")),
-                "username", String.valueOf(jwt.getClaimAsString("preferred_username")),
-                "roles", roles == null ? List.of() : roles,
-                "issuer", String.valueOf(jwt.getIssuer()),
-                "audience", jwt.getAudience(),
-                "expiresAt", String.valueOf(jwt.getExpiresAt()));
+        List<String> audiencias = jwt.getAudience();
+
+        // Se usa LinkedHashMap y no Map.of porque este ultimo lanza
+        // NullPointerException si algun claim viene ausente.
+        Map<String, Object> respuesta = new LinkedHashMap<>();
+        respuesta.put("subject", String.valueOf(jwt.getSubject()));
+        respuesta.put("name", String.valueOf(jwt.getClaimAsString("name")));
+        respuesta.put("username", String.valueOf(jwt.getClaimAsString("preferred_username")));
+        respuesta.put("roles", roles == null ? List.of() : roles);
+        respuesta.put("issuer", String.valueOf(jwt.getIssuer()));
+        respuesta.put("audience", audiencias == null ? List.of() : audiencias);
+        respuesta.put("expiresAt", String.valueOf(jwt.getExpiresAt()));
+        return respuesta;
     }
 }
