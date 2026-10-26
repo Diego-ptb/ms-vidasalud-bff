@@ -46,6 +46,21 @@ saltarse esta capa.
 | `GET /api/report/**` | ADMIN |
 | `GET /api/audit/**` | ADMIN, AUDITOR |
 
+## Rutas
+
+| Prefijo | Microservicio | Roles |
+|---|---|---|
+| `/api/appointments/**` | appointments | ADMIN, RECEPCIONISTA, PACIENTE |
+| `/api/catalog/**` | catalog | lectura: los tres · escritura: ADMIN |
+| `/api/report/**` | appointments | ADMIN |
+| `/api/audit/**` | appointments | ADMIN, AUDITOR |
+| `/api/notifications/**` | notifications | ADMIN, RECEPCIONISTA |
+| `/api/mq/**` | rabbit-admin | **ADMIN** |
+
+`/api/mq/**` administra la topología de RabbitMQ: con esos endpoints se crean y borran
+colas. Es una operación de infraestructura, así que queda restringida a ADMIN y pasa por
+el BFF como todo lo demás, para que el JWT y el rol se validen en un solo lugar.
+
 ## Ejecutar en local
 
 Requiere **JDK 17+** (Spring Boot 3.3 no funciona con Java 8).

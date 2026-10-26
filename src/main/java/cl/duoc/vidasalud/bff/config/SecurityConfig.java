@@ -77,6 +77,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/report/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/audit/**").hasAnyRole("ADMIN", "AUDITOR")
 
+                // Avisos enviados: los ve el personal del centro, no el paciente.
+                .requestMatchers(HttpMethod.GET, "/api/notifications/**")
+                    .hasAnyRole("ADMIN", "RECEPCIONISTA")
+
+                // Administracion de la mensajeria: crear y borrar colas es una
+                // operacion de infraestructura, solo para ADMIN.
+                .requestMatchers("/api/mq/**").hasRole("ADMIN")
+
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))

@@ -32,6 +32,9 @@ vidasalud:
     catalog: ${MS_CATALOG_URL:http://localhost:8082}
     report: ${MS_REPORT_URL:http://localhost:8081}
     audit: ${MS_AUDIT_URL:http://localhost:8081}
+    notifications: ${MS_NOTIFICATIONS_URL:http://localhost:8091}
+    # Microservicio administrador de RabbitMQ: colas, exchanges y bindings.
+    mq: ${MS_MQ_URL:http://localhost:8090}
 
 management:
   endpoints:

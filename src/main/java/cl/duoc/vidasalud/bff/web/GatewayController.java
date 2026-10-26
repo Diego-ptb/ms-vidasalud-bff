@@ -63,6 +63,31 @@ public class GatewayController {
     }
 
     /**
+     * Avisos enviados por ms-vidasalud-notifications. Son solo lectura: los
+     * crea el consumidor de la cola, no una peticion del usuario.
+     */
+    @RequestMapping("/api/notifications/**")
+    public ResponseEntity<String> notifications(HttpServletRequest request,
+                                                @RequestBody(required = false) String body,
+                                                Authentication auth) {
+        return forward(downstream.getNotifications(), request, body, auth);
+    }
+
+    /**
+     * Administracion de la topologia de RabbitMQ.
+     *
+     * Pasa por el BFF como todo lo demas, para que el JWT y el rol se validen
+     * una sola vez y en un solo lugar. El microservicio administrador no esta
+     * publicado en internet: solo responde a quien traiga la clave interna.
+     */
+    @RequestMapping("/api/mq/**")
+    public ResponseEntity<String> mq(HttpServletRequest request,
+                                     @RequestBody(required = false) String body,
+                                     Authentication auth) {
+        return forward(downstream.getMq(), request, body, auth);
+    }
+
+    /**
      * Email del usuario segun el token ya validado. Los microservicios lo usan
      * para acotar los datos que devuelven (un paciente solo ve lo suyo), asi
      * que tiene que salir del token y nunca de un parametro del cliente.

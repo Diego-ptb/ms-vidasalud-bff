@@ -95,6 +95,8 @@ class SecurityConfigTest {
         mvc.perform(get("/api/catalog/services")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/report/kpis")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/audit/timeline")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/mq/queues")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/notifications")).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -147,6 +149,28 @@ class SecurityConfigTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @DisplayName("Un recepcionista no administra la mensajeria")
+    void elRecepcionistaNoAdministraLaMensajeria() throws Exception {
+        // Crear o borrar colas es una operacion de infraestructura: con ella se
+        // puede dejar el sistema sin mensajeria. Solo ADMIN.
+        mvc.perform(get("/api/mq/queues").with(comoUsuarioCon("RECEPCIONISTA")))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(post("/api/mq/queues")
+                        .with(comoUsuarioCon("RECEPCIONISTA"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombre\":\"q.demo\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Un paciente no ve los avisos enviados a otros")
+    void elPacienteNoVeLosAvisos() throws Exception {
+        mvc.perform(get("/api/notifications").with(comoUsuarioCon("PACIENTE")))
+                .andExpect(status().isForbidden());
+    }
+
     // ---------------------------------------------------------------- 200
 
     @Test
@@ -174,6 +198,20 @@ class SecurityConfigTest {
 
         mvc.perform(get("/api/report/kpis").with(comoUsuarioCon("AUDITOR")))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("El admin administra la mensajeria")
+    void elAdminAdministraLaMensajeria() throws Exception {
+        mvc.perform(get("/api/mq/queues").with(comoUsuarioCon("ADMIN")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("El recepcionista si ve los avisos enviados, es parte de su trabajo")
+    void elRecepcionistaVeLosAvisos() throws Exception {
+        mvc.perform(get("/api/notifications").with(comoUsuarioCon("RECEPCIONISTA")))
+                .andExpect(status().isOk());
     }
 
     @Test

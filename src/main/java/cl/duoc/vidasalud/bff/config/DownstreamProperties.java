@@ -10,6 +10,8 @@ public class DownstreamProperties {
     private String catalog = "http://localhost:8082";
     private String report = "http://localhost:8083";
     private String audit = "http://localhost:8084";
+    private String notifications = "http://localhost:8091";
+    private String mq = "http://localhost:8090";
 
     public String getAppointments() {
         return appointments;
@@ -41,5 +43,21 @@ public class DownstreamProperties {
 
     public void setAudit(String audit) {
         this.audit = audit;
+    }
+
+    public String getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(String notifications) {
+        this.notifications = notifications;
+    }
+
+    public String getMq() {
+        return mq;
+    }
+
+    public void setMq(String mq) {
+        this.mq = mq;
     }
 }
